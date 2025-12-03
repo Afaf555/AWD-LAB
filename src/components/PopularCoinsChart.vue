@@ -10,8 +10,8 @@ const coinsStore = useCoinsStore();
 
 const topCoins = computed(() => {
   return [...coinsStore.coinDataTop50]
-    .sort((a, b) => parseFloat(b.volumeUsd24Hr) - parseFloat(a.volumeUsd24Hr))
-    .slice(0, 4);
+      .sort((a, b) => parseFloat(b.volumeUsd24Hr) - parseFloat(a.volumeUsd24Hr))
+      .slice(0, 4);
 });
 
 const coinColors2 = ref({});
@@ -22,7 +22,9 @@ const colors = [
   "rgba(255, 206, 86, 0.5)",
 ];
 
+// 🔵 користиме ова за dropdown
 const selectedCoinData = ref("1DAY");
+
 const chartData = ref({});
 
 const chartOptions = {
@@ -96,19 +98,19 @@ onMounted(() => {
 });
 
 function formatPrice(price) {
-  if (price >= 1.01) return price.toFixed(2)
+  if (price >= 1.01) return price.toFixed(2);
 
-  const [_, decimals] = price.toString().split(".")
-  if (!decimals) return price.toFixed(2)
+  const [_, decimals] = price.toString().split(".");
+  if (!decimals) return price.toFixed(2);
 
-  const firstNonZeroIndex = decimals.search(/[^0]/)
+  const firstNonZeroIndex = decimals.search(/[^0]/);
 
   if (firstNonZeroIndex >= 4) {
-    return price.toFixed(8)
+    return price.toFixed(8);
   } else if (firstNonZeroIndex >= 2) {
-    return price.toFixed(4)
+    return price.toFixed(4);
   } else {
-    return price.toFixed(2)
+    return price.toFixed(2);
   }
 }
 </script>
@@ -119,12 +121,24 @@ function formatPrice(price) {
       Today's most popular coins chart
     </h1>
 
+    <div class="w-full text-center mb-6">
+      <select
+          v-model="selectedCoinData"
+          @change="fetchChartData"
+          class="px-4 py-2 rounded bg-gray-700 text-white"
+      >
+        <option value="1DAY">1 DAY</option>
+        <option value="7DAY">7 DAY</option>
+        <option value="1MTH">1 MONTH</option>
+      </select>
+    </div>
+
     <div v-for="coin in topCoins" :key="coin.id" className="w-[45%] mb-6">
       <h2 class="text-white font-bold text-center mb-2">{{ coin.symbol }} Price</h2>
       <Line
-        v-if="chartData[coin.id] && chartData[coin.id].labels.length > 0"
-        :data="chartData[coin.id]"
-        :options="chartOptions"
+          v-if="chartData[coin.id] && chartData[coin.id].labels.length > 0"
+          :data="chartData[coin.id]"
+          :options="chartOptions"
       />
       <p v-else class="text-white text-center">
         Error fetching chart data for {{ coin.symbol }}

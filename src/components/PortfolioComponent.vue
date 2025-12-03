@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "../firebase/firebase";
-import { collection, getDocs } from "firebase/firestore";
+// import { onAuthStateChanged } from "firebase/auth";
+// import { auth, db } from "../firebase/firebase";
+// import { collection, getDocs } from "firebase/firestore";
 import { useCoinsStore } from "../store/coinsStore";
 const isLoggedIn = ref(false);
 
@@ -35,7 +35,7 @@ onMounted(() =>{
         ...doc.data()
       }))
 
-      const userSymbols = userCoins.value.map(coin => coin.symbol);  
+      const userSymbols = userCoins.value.map(coin => coin.symbol);
       filteredcoins.value = coins.filter(coin =>userSymbols.includes(coin.symbol))
 
 
