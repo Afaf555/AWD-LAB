@@ -22,7 +22,6 @@ const colors = [
   "rgba(255, 206, 86, 0.5)",
 ];
 
-// 🔵 користиме ова за dropdown
 const selectedCoinData = ref("1DAY");
 
 const chartData = ref({});
