@@ -23,15 +23,12 @@ const colors = [
 ];
 
 const selectedCoinData = ref("1DAY");
-
 const chartData = ref({});
+const lastUpdated = ref({});
 
 const chartOptions = {
   responsive: true,
-  interaction: {
-    mode: "index",
-    intersect: true,
-  },
+  interaction: { mode: "index", intersect: true },
   plugins: {
     tooltip: {
       enabled: true,
@@ -39,22 +36,20 @@ const chartOptions = {
       intersect: true,
       callbacks: {
         label: function (context) {
-          return `Price: $${formatPrice(context.parsed.y)}`;
+          return `Price: $${context.parsed.y}`;
         },
       },
     },
   },
-  scales: {
-    x: { display: false },
-    y: { display: true },
-  },
+  scales: { x: { display: false }, y: { display: true } },
 };
 
 const fetchChartData = async () => {
+  chartData.value = {};
+
   for (const coin of topCoins.value) {
     try {
       const response = await ChartService.getChart(coin.id, selectedCoinData.value);
-
       const chartArray = response.data?.data;
 
       if (chartArray && chartArray.length > 0) {
@@ -76,12 +71,17 @@ const fetchChartData = async () => {
             },
           ],
         };
-      } else {
-        console.error(`There is no chartArray data for ${coin.id}`);
       }
-    } catch (error) {
-      console.error("Error fetching chart data for " + coin.id, error);
-    }
+    } catch (error) {}
+  }
+};
+
+const refreshCharts = async () => {
+  await fetchChartData();
+  const time = new Date().toLocaleTimeString();
+
+  for (const coin of topCoins.value) {
+    lastUpdated.value[coin.id] = time;
   }
 };
 
@@ -95,23 +95,6 @@ onMounted(() => {
 
   fetchChartData();
 });
-
-function formatPrice(price) {
-  if (price >= 1.01) return price.toFixed(2);
-
-  const [_, decimals] = price.toString().split(".");
-  if (!decimals) return price.toFixed(2);
-
-  const firstNonZeroIndex = decimals.search(/[^0]/);
-
-  if (firstNonZeroIndex >= 4) {
-    return price.toFixed(8);
-  } else if (firstNonZeroIndex >= 2) {
-    return price.toFixed(4);
-  } else {
-    return price.toFixed(2);
-  }
-}
 </script>
 
 <template>
@@ -134,14 +117,25 @@ function formatPrice(price) {
 
     <div v-for="coin in topCoins" :key="coin.id" className="w-[45%] mb-6">
       <h2 class="text-white font-bold text-center mb-2">{{ coin.symbol }} Price</h2>
+
       <Line
-          v-if="chartData[coin.id] && chartData[coin.id].labels.length > 0"
+          v-if="chartData[coin.id]"
           :data="chartData[coin.id]"
           :options="chartOptions"
       />
-      <p v-else class="text-white text-center">
-        Error fetching chart data for {{ coin.symbol }}
+
+      <p v-if="lastUpdated[coin.id]" class="text-white text-center text-sm mt-1">
+        Last updated: {{ lastUpdated[coin.id] }}
       </p>
+    </div>
+
+    <div class="w-full flex justify-center mt-4">
+      <button
+          @click="refreshCharts"
+          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+      >
+        Refresh Charts
+      </button>
     </div>
   </div>
 </template>

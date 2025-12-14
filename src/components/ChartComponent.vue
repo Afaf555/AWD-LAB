@@ -35,12 +35,12 @@ const btcData = ref({
 const chartOptions = {
   responsive: true,
   interaction: {
-    mode: 'index',    // Прикажува податоци за сите серии на оската X
-    intersect: false, // Прикажува податоци дури и кога не се директно на точката
+    mode: 'index',
+    intersect: false,
   },
   plugins: {
     tooltip: {
-      enabled: true,  // Активирај tooltip
+      enabled: true,
       mode: 'index',
       intersect: true,
       callbacks: {
@@ -61,7 +61,6 @@ const chartOptions = {
 };
 
 
-// Fetch chart data based on the selected coin and period
 const fetchChartData = async () => {
   try {
     const response = await ChartService.getChart(selectedCoin.value, selectedCoinData.value);
@@ -91,7 +90,6 @@ const fetchChartData = async () => {
   }
 };
 
-// Fetch data when component mounts
 onMounted(fetchChartData);
 </script>
 
